@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
 import cors from "cors";
-import { exec } from "child_process";
+import OpenAI from "openai";
 import Audio from "./models/Audio.js";
 
 dotenv.config();
@@ -20,6 +20,13 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err.message));
+
+/* =======================
+   OpenAI Client
+======================= */
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 /* =======================
    Upload Folder
@@ -56,40 +63,40 @@ app.post("/upload-audio", upload.single("audio"), async (req, res) => {
       return res.status(400).json({ message: "No audio file uploaded" });
     }
 
-    // userId is OPTIONAL now
     const userId = req.body.userId || null;
     const audioPath = req.file.path;
 
     console.log("🎧 Audio received:", audioPath);
 
-    exec(`python transcribe.py "${audioPath}"`, async (error, stdout, stderr) => {
-      if (error) {
-        console.error("Whisper error:", error.message);
-        return res.status(500).json({
-          message: "Whisper transcription failed",
-        });
-      }
+    // 🧠 Transcribe using OpenAI Whisper API
+    const transcriptionResult = await openai.audio.transcriptions.create({
+      file: fs.createReadStream(audioPath),
+      model: "whisper-1",
+    });
 
-      const transcription = stdout.trim();
+    const transcription = transcriptionResult.text.trim();
 
-      const audio = new Audio({
-        filename: req.file.filename,
-        filepath: audioPath,
-        transcription,
-        userId,
-      });
+    // Save to MongoDB
+    const audio = new Audio({
+      filename: req.file.filename,
+      filepath: audioPath,
+      transcription,
+      userId,
+    });
 
-      await audio.save();
+    await audio.save();
 
-      res.json({
-        message: "✅ Audio uploaded & transcribed",
-        transcription,
-      });
+    // Delete file after transcription (optional)
+    fs.unlinkSync(audioPath);
+
+    res.json({
+      message: "✅ Audio uploaded & transcribed",
+      transcription,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Transcription Error:", err);
     res.status(500).json({
-      message: "Server error",
+      message: "Transcription failed",
       error: err.message,
     });
   }
@@ -119,8 +126,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
-
-
 
 
 

@@ -255,7 +255,7 @@ import axios from "axios";
 
 // ✅ Use backend URL from environment variable
 const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_URL, // Set in frontend/.env
+  baseURL: import.meta.env.VITE_BACKEND_URL, // This will be localhost:5000 for dev, Render URL for prod
 });
 
 function App() {

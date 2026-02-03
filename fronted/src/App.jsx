@@ -253,9 +253,9 @@ import { supabase } from "./supabaseClient";
 import Auth from "./Auth";
 import axios from "axios";
 
-// ✅ Use deployed backend URL
+// ✅ Use backend URL from environment variable
 const api = axios.create({
-  baseURL: "https://speech-to-text-backend.onrender.com", // Replace with your Render backend URL
+  baseURL: import.meta.env.VITE_APP_URL, // Set in frontend/.env
 });
 
 function App() {
@@ -280,7 +280,7 @@ function App() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  // 🔹 Fetch history after login
+  // 🔹 Fetch user history
   useEffect(() => {
     if (!user) return;
 

@@ -252,6 +252,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import Auth from "./Auth";
 import axios from "axios";
+console.log("PROD Backend URL:", import.meta.env.VITE_BACKEND_URL);
+
 
 // ✅ Use backend URL from environment variable
 // Make sure your .env has VITE_BACKEND_URL set

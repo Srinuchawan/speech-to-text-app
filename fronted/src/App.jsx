@@ -254,9 +254,12 @@ import Auth from "./Auth";
 import axios from "axios";
 
 // ✅ Use backend URL from environment variable
+// Make sure your .env has VITE_BACKEND_URL set
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL, // This will be localhost:5000 for dev, Render URL for prod
+  baseURL: import.meta.env.VITE_BACKEND_URL, 
 });
+
+console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL); // ✅ For debugging
 
 function App() {
   const [user, setUser] = useState(null);
@@ -294,8 +297,14 @@ function App() {
           }))
         );
       } catch (err) {
-        console.error(err);
-        setError(err.response?.data?.message || "Failed to fetch history");
+        console.error("Error fetching history:", err);
+        if (err.response) {
+          setError(err.response.data?.message || "Failed to fetch history");
+        } else if (err.request) {
+          setError("Network error: Unable to reach backend");
+        } else {
+          setError(err.message);
+        }
       }
     };
 
@@ -328,15 +337,18 @@ function App() {
       // ✅ Add to history
       setHistory((prev) => [
         ...prev,
-        {
-          text: data.transcription,
-          time: new Date().toLocaleString(),
-        },
+        { text: data.transcription, time: new Date().toLocaleString() },
       ]);
     } catch (err) {
-      console.error(err);
+      console.error("Error uploading audio:", err);
+      if (err.response) {
+        setError(err.response.data?.message || "Server error");
+      } else if (err.request) {
+        setError("Network error: Unable to reach backend");
+      } else {
+        setError(err.message);
+      }
       setStatus("❌ Failed to transcribe audio");
-      setError(err.response?.data?.message || err.message || "Server error");
     } finally {
       setLoading(false);
     }

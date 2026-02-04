@@ -252,16 +252,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import Auth from "./Auth";
 import axios from "axios";
-console.log("PROD Backend URL:", import.meta.env.VITE_BACKEND_URL);
 
-
-// ✅ Use backend URL from environment variable
-// Make sure your .env has VITE_BACKEND_URL set
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL, 
+  baseURL: import.meta.env.VITE_BACKEND_URL,
 });
-
-console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL); // ✅ For debugging
 
 function App() {
   const [user, setUser] = useState(null);
@@ -272,7 +266,6 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  // 🔹 Auth listener
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user ?? null);
@@ -285,7 +278,6 @@ function App() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  // 🔹 Fetch user history
   useEffect(() => {
     if (!user) return;
 
@@ -299,26 +291,15 @@ function App() {
           }))
         );
       } catch (err) {
-        console.error("Error fetching history:", err);
-        if (err.response) {
-          setError(err.response.data?.message || "Failed to fetch history");
-        } else if (err.request) {
-          setError("Network error: Unable to reach backend");
-        } else {
-          setError(err.message);
-        }
+        console.error(err);
       }
     };
 
     fetchHistory();
   }, [user]);
 
-  // 🔹 Upload and transcribe audio
   const handleUpload = async () => {
-    if (!file) {
-      alert("Please select an audio file");
-      return;
-    }
+    if (!file) return alert("Please select an audio file");
 
     try {
       setLoading(true);
@@ -335,28 +316,18 @@ function App() {
 
       setResult(data.transcription);
       setStatus("✅ Transcription completed");
-
-      // ✅ Add to history
       setHistory((prev) => [
         ...prev,
         { text: data.transcription, time: new Date().toLocaleString() },
       ]);
     } catch (err) {
-      console.error("Error uploading audio:", err);
-      if (err.response) {
-        setError(err.response.data?.message || "Server error");
-      } else if (err.request) {
-        setError("Network error: Unable to reach backend");
-      } else {
-        setError(err.message);
-      }
+      setError("Failed to transcribe audio");
       setStatus("❌ Failed to transcribe audio");
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔹 Logout
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -366,42 +337,44 @@ function App() {
     setStatus("");
   };
 
-  // 🔹 Show Auth page if not logged in
   if (!user) return <Auth setUser={setUser} />;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>🎤 Welcome, {user.email}</h2>
-        <button onClick={handleLogout} style={styles.button}>Logout</button>
+  <div className="app">
+    {/* Water Background */}
+    <div className="water"></div>
+
+    {/* Bubbles */}
+    <div className="bubble" style={{ left: "20%" }} />
+    <div className="bubble" style={{ left: "40%" }} />
+    <div className="bubble" style={{ left: "60%" }} />
+    <div className="bubble" style={{ left: "80%" }} />
+
+    {/* Fish */}
+    <div className="fish" style={{ top: "20%", left: "-20%" }} />
+    <div className="fish" style={{ top: "55%", left: "-30%" }} />
+    <div className="fish" style={{ top: "80%", left: "-10%" }} />
+
+    {/* Card */}
+    <div className="container">
+      <div className="card">
+        <h2 className="title">🎤 Welcome, {user.email}</h2>
+        <button className="btn" onClick={handleLogout}>Logout</button>
 
         <input
+          className="input"
           type="file"
           accept="audio/*"
           onChange={(e) => setFile(e.target.files[0])}
-          style={styles.input}
         />
 
-        <button
-          onClick={handleUpload}
-          disabled={loading}
-          style={{
-            backgroundColor: loading ? "#999" : "#2563eb",
-            cursor: loading ? "not-allowed" : "pointer",
-            width: "100%",
-            padding: "10px",
-            marginBottom: "10px",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-          }}
-        >
+        <button className="btn" onClick={handleUpload} disabled={loading}>
           {loading ? "Please wait..." : "Upload & Transcribe"}
         </button>
 
         {status && <p>{status}</p>}
-        {error && <p style={styles.error}>{error}</p>}
-        {result && <p style={styles.result}>{result}</p>}
+        {error && <p className="error">{error}</p>}
+        {result && <p className="result">{result}</p>}
 
         {history.length > 0 && (
           <>
@@ -416,49 +389,8 @@ function App() {
         )}
       </div>
     </div>
-  );
+  </div>
+);
 }
-
-const styles = {
-  container: {
-    minHeight: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#f3f4f6",
-  },
-  card: {
-    background: "#fff",
-    padding: "25px",
-    width: "420px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "15px",
-  },
-  input: {
-    width: "100%",
-    marginBottom: "12px",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    marginBottom: "10px",
-    background: "#2563eb",
-    color: "#fff",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
-  error: { color: "red" },
-  result: {
-    background: "#f9fafb",
-    padding: "10px",
-    borderRadius: "6px",
-    marginBottom: "10px",
-  },
-};
 
 export default App;

@@ -1,4 +1,4 @@
-#root {
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
@@ -39,4 +39,148 @@
 
 .read-the-docs {
   color: #888;
+} */
+
+
+/* ---------- Page Setup ---------- */
+/* ---------- Page Setup ---------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+/* water background */
+body {
+  background: #0b2a3d;
+}
+
+.app {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Water flow */
+.water {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle at 50% 50%, rgba(90, 255, 200, 0.18), transparent 60%);
+  animation: flow 15s linear infinite;
+  filter: blur(1px);
+  z-index: 1;
+}
+
+.water::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 160, 255, 0.18), transparent 60%);
+  animation: flow 20s linear infinite;
+  z-index: 1;
+}
+
+@keyframes flow {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(30%, 10%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Bubbles */
+.bubble {
+  position: absolute;
+  bottom: -50px;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  animation: bubble 8s linear infinite;
+  z-index: 2;
+}
+
+@keyframes bubble {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-1000px) scale(1.2); opacity: 0; }
+}
+
+/* Fish */
+.fish {
+  position: absolute;
+  width: 120px;
+  height: 60px;
+  background: linear-gradient(90deg, #00ffb3, #00b3ff);
+  border-radius: 50%;
+  opacity: 0.9;
+  animation: swim 12s linear infinite;
+  z-index: 2;
+}
+
+.fish::after {
+  content: "";
+  position: absolute;
+  right: -25px;
+  top: 10px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(90deg, #00b3ff, #00ffb3);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+@keyframes swim {
+  0% { transform: translate(-20%, 50%) rotate(0deg); }
+  50% { transform: translate(120%, 40%) rotate(5deg); }
+  100% { transform: translate(-20%, 50%) rotate(0deg); }
+}
+
+/* Card styling */
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+.card {
+  width: 420px;
+  padding: 25px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  position: relative;
+  z-index: 5;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.input {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.error { color: red; }
+
+.result {
+  background: #f9fafb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.app {
+  border: 5px solid red;
 }

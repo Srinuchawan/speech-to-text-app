@@ -30,19 +30,26 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  justify-content: center; /* Horizontally centers content */
-  align-items: center; /* Vertically centers content */
   min-width: 320px;
   min-height: 100vh;
-  background-color: rgb(139, 217, 223); /* Background color */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  /* IMPORTANT: remove flex centering */
+  display: block;
+
+  /* background for page */
+  background: #0b2a3d;
+}
+
+/* optional: keep default text color */
+body, p, h1, h2, h3 {
+  color: #fff;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-  text-align: center; /* Ensures h1 is centered */
+  text-align: center;
 }
 
 button {
